@@ -1,1 +1,1 @@
-MrNodo App
+Craeción de README y Gemfile
