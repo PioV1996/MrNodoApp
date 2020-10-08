@@ -15,5 +15,5 @@ get '/' do
     content_type 'text/xml'
     Twilio::TwiML::VoiceResponse.new do |respuesta|
         respuesta.say(message: 'Bienvenido a Mister. Nodo, por favor escuche nuestro menú', voice: 'woman', language: 'es-MX')
-    end
+    end.to_s
 end
