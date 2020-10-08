@@ -12,7 +12,8 @@ account_sid = ENV['TWILIO_ACCOUNT_SID']
 
 # Método principal, donde se introduce al usuario al menú principal
 get '/' do
+    content_type 'text/xml'
     Twilio::TwiML::VoiceResponse.new do |respuesta|
-        respuesta.say(message: 'Bienvenido a Misterr. Nodo, por favor escuche nuestro menú', voice: 'woman', language: 'es-MX')
+        respuesta.say(message: 'Bienvenido a Mister. Nodo, por favor escuche nuestro menú', voice: 'woman', language: 'es-MX')
     end
 end
