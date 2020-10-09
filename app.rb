@@ -50,16 +50,18 @@ get '/eleccion' do
             Twilio::TwiML::VoiceResponse.new do |r|
                 r.say(message: 'Será comunicado en un momento', voice: 'woman', language: 'es-MX')
                 r.redirect('/conectar')
-            end
+            end.to_s
         else
+            content_type 'text/xml'
             Twilio::TwiML::VoiceResponse.new do |r|
                 r.say(message: 'Opción no válida', voice: 'woman', language: 'es-MX')
                 r.redirect('/menu', method: 'get')
-            end
+            end.to_s
         end
     else
         Twilio::TwiML::VoiceResponse.new do |respuesta|
             respuesta.say(message: 'Opción inválida', voice: 'woman', language: 'es-MX')
+            respuesta.redirect('/menu', method: 'get')
         end
     end
 end
