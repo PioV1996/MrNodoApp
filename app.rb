@@ -42,7 +42,21 @@ end
 get '/eleccion' do
     content_type 'text/xml'
     if params['Digits']
-        
+        digito = params['Digits']
+
+        case digito
+        when '1' 
+            content_type 'text/xml'
+            Twilio::TwiML::VoiceResponse.new do |r|
+                r.say(message: 'Será comunicado en un momento', voice: 'woman', language: 'es-MX')
+                r.redirect('/conectar')
+            end
+        else
+            Twilio::TwiML::VoiceResponse.new do |r|
+                r.say(message: 'Opción no válida', voice: 'woman', language: 'es-MX')
+                r.redirect('/menu', method: 'get')
+            end
+        end
     else
         Twilio::TwiML::VoiceResponse.new do |respuesta|
             respuesta.say(message: 'Opción inválida', voice: 'woman', language: 'es-MX')
