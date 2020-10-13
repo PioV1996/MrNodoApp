@@ -6,9 +6,19 @@ require 'twilio-ruby'
 # Se definen los orígenes (IPs) que el servidor puede procesar
 set :bind, '0.0.0.0'
 
+# Se inicializan las variable globales para almancenar las llamadas entrantes y que son trasladados a espera
+$numeros = Array.new
+$id = ''
+$id_queue = ''
+
 # Definición de credenciales necesarias para consumir Apis de Twlio
 auth_token  = 
 account_sid = 
+
+# Creación de variable global $cliente, el cual interactua con la información que la cuenta maneja, tal como las llamadas que están en espera, o los 
+# identificadores únicos para cada número telefónico que llama al número asignado por Twilio
+$cliente = Twilio::REST::Client.new(account_sid, auth_token)
+
 
 # Método principal, donde se introduce al usuario al menú principal, y da infromación acerca de Mr. Nodo
 get '/' do
@@ -45,12 +55,16 @@ get '/eleccion' do
         digito = params['Digits']
 
         case digito
-        when '1' 
+        # Cuando se seleccione la primera opción del menú, el usuario sera redireccionado al módulo para conectar con un ejecutvo
+        # de Mr. Nodo.
+        when '1'
             content_type 'text/xml'
             Twilio::TwiML::VoiceResponse.new do |r|
                 r.say(message: 'Será comunicado en un momento', voice: 'woman', language: 'es-MX')
-                r.redirect('/conectar')
+                r.redirect('/conectar', method: 'get')
             end.to_s
+        # Si el usuario ingresa una opción no listada en el menú principal, será advertido por un mensaje, y se le redirige para
+        # volver a ingresar un dígito válido.
         else
             content_type 'text/xml'
             Twilio::TwiML::VoiceResponse.new do |r|
@@ -62,6 +76,56 @@ get '/eleccion' do
         Twilio::TwiML::VoiceResponse.new do |respuesta|
             respuesta.say(message: 'Opción inválida', voice: 'woman', language: 'es-MX')
             respuesta.redirect('/menu', method: 'get')
-        end
+        end.to_S
     end
+end
+
+# Se define el método conectar, el cual está encargado de hacer la conexión entre el usuario y los asesores de Mr. Nodo, en caso de que no haya
+# nadie disponible, el usuario es llevado a una lista de espera, donde se le informa al usuario que deberá esperar para ser atendido.
+get '/conectar' do
+    content_type 'text/xml'
+    $id = params['CallSid']
+    espera = $cliente.queues($id_queue.to_s).fetch
+    if espera.current_size == 0
+        Twilio::TwiML::VoiceResponse.new do |r|
+            r.say(message: 'No hay asesor disponible, será puesto en una lista de espera.', voice:'woman', language: 'es-MX')
+            r.redirect('/espera', method: 'get')
+        end.to_s
+    else
+        content_type 'text/xml'
+        comunicar = $numeros.shift
+        Twilio::TwiML::VoiceResponse.new do |r|
+            r.dial do |d|
+                d.queue(comunicar.to_s, url: '/conectando')
+            end
+        end.to_s
+    end
+end
+
+# Se define el método de espera, el cual crea la espera por medio del verbo "enqueue", el cual crea un identificador único, el cual es tomado para 
+# comunicar con la persona que este disponible para atender, dicho identificador es almacenado en un Array de n elementos.
+get '/espera' do
+    content_type 'text/xml'
+    $numeros.push($id)
+    Twilio::TwiML::VoiceResponse.new do |r|
+        r.enqueue(wait_url: '/cola', name: $id)
+    end.to_s
+end
+
+# Método al que se accede cuando el usuario entra en espera para ser atendido, el cual recuepra el identificado de la espera, para posteriormente 
+# ser comunicado una vez que haya alguien disponible, y reproduce un audio para el usuario.
+post '/cola' do
+    content_type 'text/xml'
+    $id_queue = params['QueueSid']
+    Twilio::TwiML::VoiceResponse.new do |r|
+        r.say(message: 'Espere un momento por favor, un asesor le atenderá', voice: 'woman', language: 'es-MX')
+        r.play(loop:10 , url: 'https://api.twilio.com/cowbell.mp3')
+    end.to_s
+end
+
+# Se define el método "conectando", el cual avisa al usuario que será conectado con con el asesor disponible
+post "/conectando" do
+    Twilio::TwiML::VoiceResponse.new do |r|
+        r.say(message: 'Está siendo comunicado, espere un momento por favor', voice: 'woman', language: 'es-MX')
+    end.to_s
 end
