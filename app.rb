@@ -3,6 +3,11 @@
 require 'sinatra'
 require 'twilio-ruby'
 
+# Añadiendo librerías necesarias para la creación de tablas en la base de datos.
+require 'active_record'
+require 'sinatra/activerecord' 
+
+
 # Se definen los orígenes (IPs) que el servidor puede procesar
 set :bind, '0.0.0.0'
 
@@ -146,7 +151,7 @@ post '/mensaje' do
         r.say('Por favor, proporcione su nombre completo, así como el motivo de su llamada, y algún telefóno para poder comunicarnos' + 
         ' lo más pronto posible', voice: 'woman', language: 'es-MX')
         r.record(action: '/enviar', method: 'post', finish_on_key: '#')
-    end
+    end.to_s
 end
 
 post '/enviar' do
