@@ -174,10 +174,10 @@ post '/enviar' do
             Call.create(c)
         end
     end
-end
     Twilio::TwiML::VoiceResponse.new do |r|
         r.say(message: 'Gracias por su mensaje, nos pondremos en contacto con usted lo mas' + 
         ' pronto posible. Hasta pronto', voice: 'woman', language: 'es-MX')
         r.hangup
     end.to_s
 end
+    
