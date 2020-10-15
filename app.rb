@@ -79,7 +79,7 @@ get '/eleccion' do
         # que el usuario deje un mensaje al usuario.
         when '2'
             content_type 'text/xml'
-            Twilio::TwiML:VoiceResponse.new do |r|
+            Twilio::TwiML::VoiceResponse.new do |r|
                 r.redirect('/mensaje', method: 'post')
             end.to_s
         # Si el usuario ingresa una opción no listada en el menú principal, será advertido por un mensaje, y se le redirige para
