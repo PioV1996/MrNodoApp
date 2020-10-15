@@ -171,7 +171,7 @@ post '/enviar' do
             link: @url
         }]
         llamada.each do |c|
-            c.create()
+            Call.create(c)
         end
     end
 end
