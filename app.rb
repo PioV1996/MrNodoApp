@@ -1,3 +1,9 @@
+# Se hace el llamado del archivo modelo para la comunicación entre la aplicación
+# y la base de datos, obteniendo el valor de la ruta de la carpeta raíz del proyecto
+# y dirigiéndose a la carpeta "models" y llamar a todos los ficeros disponibles
+current_dir = Dir.pwd
+Dir["#{current_dir}/models/*.rb"].each {|file| require file}
+
 # Ingreso de las librerías necesarias para la funcionalidad
 # de la aplicación web.
 require 'sinatra'
