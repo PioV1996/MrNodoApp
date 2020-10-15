@@ -157,7 +157,18 @@ end
 post '/enviar' do
     if params['RecordingUrl']
         @url = params['RecordingUrl']
+        @tiempo = Time.now()
+        @numero = params['From']
+        llamada = [{
+            telefono: @numero,
+            fecha: @tiempo
+            link: @url
+        }]
+        llamada.each do |c|
+            c.create()
+        end
     end
+end
     Twilio::TwiML::VoiceResponse.new do |r|
         r.say(message: 'Gracias por su mensaje, nos pondremos en contacto con usted lo mas' + 
         ' pronto posible. Hasta pronto', voice: 'woman', language: 'es-MX')
