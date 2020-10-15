@@ -167,7 +167,7 @@ post '/enviar' do
         @numero = params['From']
         llamada = [{
             telefono: @numero,
-            fecha: @tiempo
+            fecha: @tiempo,
             link: @url
         }]
         llamada.each do |c|
