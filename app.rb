@@ -154,8 +154,8 @@ end
 # Una vez se haya realizado esta acción, se redirige al módulo "/enviar" para realizar el registro de la llamada 
 post '/mensaje' do
     Twilio::TwiML::VoiceResponse.new do |r|
-        r.say('Por favor, proporcione su nombre completo, así como el motivo de su llamada, y algún telefóno para poder comunicarnos' + 
-        ' lo más pronto posible', voice: 'woman', language: 'es-MX')
+        r.say(message: 'Por favor, proporcione su nombre completo, así como el motivo de su llamada, y algún telefóno' +
+        ' para poder comunicarnos lo más pronto posible', voice: 'woman', language: 'es-MX')
         r.record(action: '/enviar', method: 'post', finish_on_key: '#')
     end.to_s
 end
