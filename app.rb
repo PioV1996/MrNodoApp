@@ -6,6 +6,7 @@ Dir["#{current_dir}/models/*.rb"].each {|file| require file}
 
 # Ingreso de las librerías necesarias para la funcionalidad
 # de la aplicación web.
+require 'rubygems'
 require 'sinatra'
 require 'twilio-ruby'
 
@@ -155,7 +156,7 @@ end
 post '/mensaje' do
     Twilio::TwiML::VoiceResponse.new do |r|
         r.say(message: 'Por favor, proporcione su nombre completo, así como el motivo de su llamada, y algún telefóno' +
-        ' para poder comunicarnos lo más pronto posible', voice: 'woman', language: 'es-MX')
+        ' para poder comunicarnos lo más pronto posible, presione gato para terminar', voice: 'woman', language: 'es-MX')
         r.record(action: '/enviar', method: 'post', finish_on_key: '#')
     end.to_s
 end
